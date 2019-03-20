@@ -1,4 +1,4 @@
-version: '2'
+version: '3.7'
 
 services:
 
@@ -7,49 +7,58 @@ services:
       context: elasticsearch/
       args:
         ELK_VERSION: $ELK_VERSION
-    volumes:
-      - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
-    ports:
-      - "9200:9200"
-      - "9300:9300"
     environment:
       ES_JAVA_OPTS: "-Xmx256m -Xms256m"
-    networks:
-      - elk
-
-  logstash:
-    build:
-      context: logstash/
-      args:
-        ELK_VERSION: $ELK_VERSION
-    volumes:
-      - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
-      - ./logstash/pipeline:/usr/share/logstash/pipeline:ro
     ports:
-      - "5000:5000"
-      - "9600:9600"
-    environment:
-      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+      - 9200 # not expose publicly
+      - 9300 # not expose publicly
+    volumes:
+      - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+      - elasticsearch_data:/usr/share/elasticsearch/data
     networks:
       - elk
-    depends_on:
-      - elasticsearch
+    restart: always
 
   kibana:
     build:
       context: kibana/
       args:
         ELK_VERSION: $ELK_VERSION
+    ports:
+      - 5601 # not expose publicly
     volumes:
       - ./kibana/config/:/usr/share/kibana/config:ro
-    ports:
-      - "5601:5601"
+      - kibana_data:/usr/share/kibana/data
     networks:
       - elk
-    depends_on:
-      - elasticsearch
+    restart: always
+
+  logstash:
+    build:
+      context: logstash/
+      args:
+        ELK_VERSION: $ELK_VERSION
+    environment:
+      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+    ports:
+      - 5000:5000
+      - 5010:5010
+      - 9600:9600
+    volumes:
+      - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
+      - ./logstash/pipeline:/usr/share/logstash/pipeline:ro
+      - ./logstash/templates:/usr/share/logstash/templates:ro
+    networks:
+      - elk
+    restart: always
+
+# volumes are located to /var/lib/docker/volumes/ (on host)
+volumes:
+  elasticsearch_data:
+    driver: local
+  kibana_data:
+    driver: local
 
 networks:
-
   elk:
     driver: bridge
