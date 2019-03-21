@@ -70,8 +70,10 @@ if (!DEBUG) {
 
         if (CLEAR_AT_START) {
             console.log("Clearing all iota indices");
-            if (await client.indices.exists({ index: "iota_" + c })) {
-                await client.indices.delete({ index: "iota_" + c });
+            for (const c of subscribedChannels) {
+                if (await client.indices.exists({ index: "iota_" + c })) {
+                    await client.indices.delete({ index: "iota_" + c });
+                }
             }
         }
 
