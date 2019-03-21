@@ -52,6 +52,13 @@ services:
       - elk
     restart: always
 
+  iota:
+    build:
+      context: iota/
+    networks:
+      - elk
+    restart: always
+
 # volumes are located to /var/lib/docker/volumes/ (on host)
 volumes:
   elasticsearch_data:

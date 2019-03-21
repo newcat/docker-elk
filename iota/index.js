@@ -2,7 +2,7 @@ const zmq = require("zeromq");
 const sock = zmq.socket("sub");
 
 const { Client } = require('@elastic/elasticsearch')
-const client = new Client({ node: 'http://localhost:9200' })
+const client = new Client({ node: 'http://elasticsearch:9200' })
 
 const subscribedChannels = ["sn", "tx", "rstat", "mctn", "lmi", "lmsi", "lmhs"];
 
