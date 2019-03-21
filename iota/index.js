@@ -2,7 +2,7 @@ const zmq = require("zeromq");
 const sock = zmq.socket("sub");
 
 const { Client } = require('@elastic/elasticsearch')
-const client = new Client({ node: 'http://elasticsearch:9200' })
+const client = new Client({ node: 'http://elasticsearch:9200',  })
 
 const subscribedChannels = ["sn", "tx", "rstat", "mctn", "lmi", "lmsi", "lmhs"];
 
@@ -38,11 +38,24 @@ function handleMessage(msg) {
             id: data[1],
             body: dataObject
         });
+        console.log("Stored TX");
     }
 
 };
 
+function sleep(ms) {
+    return new Promise((res) => {
+        setTimeout(res, ms);
+    });
+}
+
 (async () => {
+
+    await sleep(30000);
+
+    while (!(await client.ping())) {
+        await sleep(5000);
+    }
 
     for (const c of subscribedChannels) {
         if (!(await client.indices.exists({ index: "iota_" + c }))) {
