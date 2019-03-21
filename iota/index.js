@@ -40,7 +40,7 @@ function handleMessage(msg) {
         });
     }
 
-});
+};
 
 (async () => {
 
