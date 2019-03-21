@@ -23,20 +23,20 @@ function handleMessage(msg) {
                 address: data[2],
                 value: parseInt(data[3] || "0"),
                 obsoleteTag: data[4],
-                transactionTimestamp: new Date(parseInt(data[5]) * 1000),
+                transactionTimestamp: parseInt(data[5]) * 1000,
                 currentIndex: parseInt(data[6] || "0"),
                 lastIndex: parseInt(data[7] || "0"),
                 bundle: data[8],
                 trunkTransaction: data[9],
                 branchTransaction: data[10],
-                received: new Date(parseInt(data[11] || "0")),
+                received: parseInt(data[11] || "0"),
                 tag: data[12]
             };
             break;
     }
 
     if (dataObject) {
-        dataObject.timestamp = new Date();
+        dataObject.timestamp = Date.now();
     }
 
     if (data[0] === "tx") {
@@ -78,13 +78,6 @@ if (!DEBUG) {
                         console.warn("Failed to delete index iota_" + c);
                     }
                 }
-            }
-        }
-
-        for (const c of subscribedChannels) {
-            if (!(await client.indices.exists({ index: "iota_" + c }))) {
-                console.log("Creating index iota_" + c);
-                await client.indices.create({ index: "iota_" + c });
             }
         }
 
