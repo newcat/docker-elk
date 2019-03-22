@@ -1,10 +1,11 @@
 const zmq = require("zeromq");
-const sock = zmq.socket("sub");
+const { Client } = require('@elastic/elasticsearch')
+const mappings = require("./mappings");
 
 const DEBUG = false;
 const CLEAR_AT_START = true;
 
-const { Client } = require('@elastic/elasticsearch')
+const sock = zmq.socket("sub");
 const client = new Client({ node: 'http://elasticsearch:9200',  })
 
 const subscribedChannels = ["sn", "tx", "rstat", "mctn", "lmi", "lmsi", "lmhs"];
@@ -113,13 +114,24 @@ if (!DEBUG) {
         if (CLEAR_AT_START) {
             console.log("Clearing all iota indices");
             for (const c of subscribedChannels) {
-                if (await client.indices.exists({ index: "iota_" + c })) {
+                const index = "iota_" + c;
+                if (await client.indices.exists({ index })) {
                     try {
-                        await client.indices.delete({ index: "iota_" + c });
+                        await client.indices.delete({ index });
                     } catch (err) {
-                        console.warn("Failed to delete index iota_" + c);
+                        console.warn("Failed to delete index " + index);
                     }
                 }
+                await client.indices.create({ index });
+                const m = mappings[c];
+                m.timestamp = { type: "date" };
+                await client.indices.putMapping({ index, type: "_doc", body: {
+                    mappings: {
+                        _doc: {
+                            properties: m
+                        }
+                    }
+                }});
             }
         }
 
