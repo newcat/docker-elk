@@ -12,7 +12,7 @@ const subscribedChannels = ["sn", "tx", "rstat", "mctn", "lmi", "lmsi", "lmhs"];
 sock.connect('tcp://iota.ormos.online:5556');
 subscribedChannels.forEach((c) => sock.subscribe(c));
 
-function handleMessage(msg) {
+async function handleMessage(msg) {
     const data = msg.toString().split(' ');
 
     let dataObject;
@@ -81,7 +81,7 @@ function handleMessage(msg) {
     }
 
     if (!DEBUG) {
-        client.index({
+        await client.index({
             index: "iota_" + data[0],
             body: dataObject
         });
