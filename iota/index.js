@@ -80,13 +80,13 @@ async function handleMessage(msg) {
         dataObject.timestamp = Date.now();
     }
 
-    if (!DEBUG) {
+    if (!DEBUG && dataObject) {
         await client.index({
             index: "iota_" + data[0],
             body: dataObject
         });
     } else {
-        console.log(dataObject);
+        console.log(data[0], dataObject);
     }
 
 };
