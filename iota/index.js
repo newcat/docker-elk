@@ -17,6 +17,16 @@ function handleMessage(msg) {
 
     let dataObject;
     switch(data[0]) {
+        case "sn":
+            dataObject = {
+                milestoneIndex: data[1],
+                transaction: data[2],
+                address: data[3],
+                trunkTransaction: data[4],
+                branchTransaction: data[5],
+                bundle: data[6]
+            };
+            break;
         case "tx":
             dataObject = {
                 hash: data[1],
@@ -33,22 +43,51 @@ function handleMessage(msg) {
                 tag: data[12]
             };
             break;
+        case "rstat":
+            dataObject = {
+                tipTxToProcess: parseInt(data[1]),
+                tipTxToBroadcast: parseInt(data[2]),
+                tipTxToRequest: parseInt(data[3]),
+                tipTxToReply: parseInt(data[4]),
+                storedTx: parseInt(data[5])
+            };
+            break;
+        case "mctn":
+            dataObject = {
+                numTransactions: parseInt(data[1])
+            };
+            break;
+        case "lmi":
+            dataObject = {
+                prevMIndex: parseInt(data[1]),
+                latestMIndex: parseInt(data[2])
+            };
+            break;
+        case "lmsi":
+            dataObject = {
+                prevSSMIndex: parseInt(data[1]),
+                latestSSMIndex: parseInt(data[2])
+            };
+            break;
+        case "lmhs":
+            dataObject = {
+                hash: data[1]
+            };
+            break;
     }
 
     if (dataObject) {
         dataObject.timestamp = Date.now();
     }
 
-    if (data[0] === "tx") {
-        if (!DEBUG) {
-            client.index({
-                index: "iota_" + data[0],
-                id: data[1],
-                body: dataObject
-            });
-        } else {
-            console.log(dataObject);
-        }
+    if (!DEBUG) {
+        client.index({
+            index: "iota_" + data[0],
+            id: data[1],
+            body: dataObject
+        });
+    } else {
+        console.log(dataObject);
     }
 
 };
