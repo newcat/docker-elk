@@ -1,7 +1,7 @@
 const zmq = require("zeromq");
 const sock = zmq.socket("sub");
 
-const DEBUG = true;
+const DEBUG = false;
 const CLEAR_AT_START = true;
 
 const { Client } = require('@elastic/elasticsearch')
