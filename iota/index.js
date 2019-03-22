@@ -1,7 +1,7 @@
 const zmq = require("zeromq");
 const sock = zmq.socket("sub");
 
-const DEBUG = false;
+const DEBUG = true;
 const CLEAR_AT_START = true;
 
 const { Client } = require('@elastic/elasticsearch')
@@ -83,7 +83,6 @@ function handleMessage(msg) {
     if (!DEBUG) {
         client.index({
             index: "iota_" + data[0],
-            id: data[1],
             body: dataObject
         });
     } else {
