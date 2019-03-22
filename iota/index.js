@@ -15,6 +15,10 @@ subscribedChannels.forEach((c) => sock.subscribe(c));
 async function handleMessage(msg) {
     const data = msg.toString().split(' ');
 
+    if (!subscribedChannels.includes(data[0])) {
+        return;
+    }
+
     let dataObject;
     switch(data[0]) {
         case "sn":
