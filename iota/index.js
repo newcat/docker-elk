@@ -125,13 +125,7 @@ if (!DEBUG) {
                 await client.indices.create({ index });
                 const m = mappings[c];
                 m.timestamp = { type: "date" };
-                await client.indices.putMapping({ index, type: "_doc", body: {
-                    mappings: {
-                        _doc: {
-                            properties: m
-                        }
-                    }
-                }});
+                await client.indices.putMapping({ index, type: "_doc", body: { properties: m }});
             }
         }
 
