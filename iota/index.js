@@ -3,7 +3,7 @@ const { Client } = require('@elastic/elasticsearch')
 const mappings = require("./mappings");
 
 const DEBUG = false;
-const CLEAR_AT_START = true;
+const CLEAR_AT_START = false;
 
 const sock = zmq.socket("sub");
 const client = new Client({ node: 'http://elasticsearch:9200',  })
@@ -86,10 +86,14 @@ async function handleMessage(msg) {
     }
 
     if (!DEBUG && dataObject) {
-        await client.index({
-            index: "iota_" + data[0],
-            body: dataObject
-        });
+        try {
+            await client.index({
+                index: "iota_" + data[0],
+                body: dataObject
+            });
+        } catch (err) {
+            console.log(err);
+        }
     } else {
         console.log(data[0], dataObject);
     }
