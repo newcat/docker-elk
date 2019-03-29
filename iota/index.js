@@ -9,6 +9,10 @@ const sock = zmq.socket("sub");
 const client = new Client({ node: 'http://elasticsearch:9200',  })
 
 const subscribedChannels = ["sn", "tx", "rstat", "mctn", "lmi", "lmsi", "lmhs"];
+let bulk = [];
+let tempBulk = [];
+const bulkInProgress = false;
+const MAX_BULK = 100;
 
 sock.connect('tcp://iota.ormos.online:5556');
 subscribedChannels.forEach((c) => sock.subscribe(c));
@@ -87,10 +91,19 @@ async function handleMessage(msg) {
 
     if (!DEBUG && dataObject) {
         try {
-            await client.index({
-                index: "iota_" + data[0],
-                body: dataObject
-            });
+            (bulkInProgress ? tempBulk : bulk).push(
+                { index: { _index: "iota_" + data[0] } },
+                dataObject
+            );
+            if (!bulkInProgress && bulk.length >= MAX_BULK) {
+                bulkInProgress = true;
+                await client.bulk({
+                    body: bulk
+                });
+                bulk = tempBulk;
+                tempBulk = [];
+                bulkInProgress = false;
+            }
         } catch (err) {
             console.log(err);
         }
