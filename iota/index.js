@@ -92,7 +92,7 @@ async function handleMessage(msg) {
     if (!DEBUG && dataObject) {
         try {
             (bulkInProgress ? tempBulk : bulk).push(
-                { index: { _index: "iota_" + data[0] } },
+                { index: { _index: "iota_" + data[0], _type: "_doc" } },
                 dataObject
             );
             if (!bulkInProgress && bulk.length >= MAX_BULK) {
@@ -106,6 +106,10 @@ async function handleMessage(msg) {
             }
         } catch (err) {
             console.log(err);
+            if (err && err.body && err.body.error) {
+                console.log(err.body.error);
+            }
+            bulkInProgress = false;
         }
     } else {
         console.log(data[0], dataObject);
