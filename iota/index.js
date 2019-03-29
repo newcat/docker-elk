@@ -11,7 +11,7 @@ const client = new Client({ node: 'http://elasticsearch:9200',  })
 const subscribedChannels = ["sn", "tx", "rstat", "mctn", "lmi", "lmsi", "lmhs"];
 let bulk = [];
 let tempBulk = [];
-const bulkInProgress = false;
+let bulkInProgress = false;
 const MAX_BULK = 100;
 
 sock.connect('tcp://iota.ormos.online:5556');
